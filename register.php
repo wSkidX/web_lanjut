@@ -8,11 +8,11 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
-    <link rel="stylesheet" href="AdminLTE-3.2.0/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="admin/AdminLTE-3.2.0/plugins/fontawesome-free/css/all.min.css">
 
-    <link rel="stylesheet" href="AdminLTE-3.2.0/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="admin/AdminLTE-3.2.0/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 
-    <link rel="stylesheet" href="AdminLTE-3.2.0/dist/css/adminlte.min.css?v=3.2.0">
+    <link rel="stylesheet" href="admin/AdminLTE-3.2.0/dist/css/adminlte.min.css?v=3.2.0">
 </head>
 
 <body class="hold-transition register-page">
@@ -62,7 +62,7 @@
                         </div>
                         <?php
                         if (isset($_POST['submit'])) {
-                            include 'backend/koneksi.php';
+                            include 'admin/koneksi.php';
                             $user_email = $_POST['email'];
                             $user_pass = md5($_POST['password']); // Enkripsi password dengan md5
 
@@ -93,11 +93,11 @@
     </div>
 
 
-    <script src="AdminLTE-3.2.0/plugins/jquery/jquery.min.js"></script>
+    <script src="admin/AdminLTE-3.2.0/plugins/jquery/jquery.min.js"></script>
 
-    <script src="AdminLTE-3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="admin/AdminLTE-3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <script src="AdminLTE-3.2.0/dist/js/adminlte.min.js?v=3.2.0"></script>
+    <script src="admin/AdminLTE-3.2.0/dist/js/adminlte.min.js?v=3.2.0"></script>
 </body>
 
 </html>
