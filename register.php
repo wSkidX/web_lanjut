@@ -25,6 +25,14 @@
                 <p class="login-box-msg">Register a new membership</p>
                 <form action="" method="post">
                     <div class="input-group mb-3">
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Lengkap">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
                         <input type="email" name="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
@@ -41,7 +49,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Retype password">
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Konfirmasi password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -50,7 +58,7 @@
                     </div>
                     <div class="row">
                         <div class="col-8">
-                            <div class="icheck-primary">
+                            <div class="icheck-primary required">
                                 <input type="checkbox" id="agreeTerms" name="terms" value="agree">
                                 <label for="agreeTerms">
                                     I agree to the <a href="#">terms</a>
@@ -63,19 +71,27 @@
                         <?php
                         if (isset($_POST['submit'])) {
                             include 'admin/koneksi.php';
+                            $nama = $_POST['nama'];
                             $user_email = $_POST['email'];
-                            $user_pass = md5($_POST['password']); // Enkripsi password dengan md5
+                            $user_pass = $_POST['password'];
+                            $confirm_pass = $_POST['confirm_password'];
+
+                            // Validasi password
+                            if ($user_pass !== $confirm_pass) {
+                                echo "<script>alert('Password tidak cocok'); window.location.href='register.php';</script>";
+                                exit;
+                            }
+
+                            $user_pass = md5($user_pass); // Enkripsi password dengan md5
 
                             // Cek apakah email sudah terdaftar
                             $check_email = mysqli_query($db, "SELECT * FROM user WHERE email='$user_email'");
                             if (mysqli_num_rows($check_email) > 0) {
                                 echo "<script>alert('Email sudah terdaftar'); window.location.href='register.php';</script>";
                             } else {
-                                $register = mysqli_query($db, "INSERT INTO user (email, password) VALUES ('$user_email', '$user_pass')");
+                                $register = mysqli_query($db, "INSERT INTO user (nama, email, password) VALUES ('$nama', '$user_email', '$user_pass')");
                                 if ($register) {
-                                    echo "Register berhasil";
-                                    header("Location: login.php");
-                                    exit;
+                                    echo "<script>alert('Register berhasil'); window.location.href='login.php';</script>";
                                 } else {
                                     echo "<script>alert('Register gagal'); window.location.href='register.php';</script>";
                                 }

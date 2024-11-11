@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<div class="card-body-responsive">
         <h1 class="h2">Prodi</h1>
       </div>
 <?php 
@@ -17,7 +17,7 @@ switch ($aksi) {
                 <i class="fas fa-table me-1"></i>
                 Daftar Program Studi
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <div class="mb-3">
                     <a href="index.php?p=prodi&aksi=input" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Tambah Program Studi

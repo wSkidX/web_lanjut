@@ -40,7 +40,10 @@ if ($_GET['proses'] == 'insert') {
             if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
                 echo "The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.";
                 
-                $sql = mysqli_query($db, "INSERT INTO berita (user_id, kategori_id, judul, file_upload, isi_berita) VALUES ('$_SESSION[user_id]', '$_POST[kategori_id]', '$_POST[judul]', '$nama_file', '$_POST[isi_berita]')");
+                $user_id = $_POST['user_id'];
+                
+                $sql = mysqli_query($db, "INSERT INTO berita (user_id, kategori_id, judul, file_upload, isi_berita) 
+                        VALUES ('$user_id', '$_POST[kategori_id]', '$_POST[judul]', '$nama_file', '$_POST[isi_berita]')");
 
                 if ($sql) {
                     echo "<script>window.location='index.php?p=berita'</script>";
@@ -56,18 +59,29 @@ if ($_GET['proses'] == 'insert') {
 
 if ($_GET['proses'] == 'edit') {
     include 'koneksi.php';
-
-    $sql = mysqli_query($db, "UPDATE berita SET 
-        kategori_id = '$_POST[kategori_id]',
-        judul = '$_POST[judul]',
-        file_upload = '$_POST[file_upload]',
-        isi_berita = '$_POST[isi_berita]'
-        WHERE id = '$_POST[id]'");
-
-    if ($sql) {
-        echo "<script>window.location='index.php?p=berita'</script>";
+    
+    $berita_id = $_POST['id'];
+    $user_id = $_SESSION['user']['id'];
+    
+    $cek_pemilik = mysqli_query($db, "SELECT user_id FROM berita WHERE id = '$berita_id'");
+    $data_berita = mysqli_fetch_assoc($cek_pemilik);
+    
+    if ($_SESSION['user']['level'] == 'admin' || $data_berita['user_id'] == $user_id) {
+        $sql = mysqli_query($db, "UPDATE berita SET 
+            kategori_id = '$_POST[kategori_id]',
+            judul = '$_POST[judul]',
+            file_upload = '$_POST[file_upload]',
+            isi_berita = '$_POST[isi_berita]'
+            WHERE id = '$berita_id'");
+            
+        if ($sql) {
+            echo "<script>window.location='index.php?p=berita'</script>";
+        } else {
+            echo "Error: " . mysqli_error($db);
+        }
     } else {
-        echo "Error: " . mysqli_error($db);
+        echo "<script>alert('Anda tidak memiliki hak untuk mengedit berita ini');
+              window.location='index.php?p=berita';</script>";
     }
 }
 

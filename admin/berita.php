@@ -34,8 +34,23 @@ switch ($aksi) {
                         <tbody>
                         <?php
                         include 'koneksi.php';
-                        $ambil = mysqli_query($db, "SELECT * FROM user,kategori,berita WHERE 
-                        user_id=berita.user_id AND kategori.id=berita.kategori_id");
+                        
+                        // Jika user adalah admin, tampilkan semua berita
+                        if ($_SESSION['user']['level'] == 'admin') {
+                            $ambil = mysqli_query($db, "SELECT berita.*, user.nama as penulis, user.email, kategori.nama_kategori 
+                                                      FROM berita 
+                                                      JOIN user ON user.id = berita.user_id 
+                                                      JOIN kategori ON kategori.id = berita.kategori_id");
+                        } else {
+                            // Jika bukan admin, tampilkan hanya berita yang dibuat oleh user tersebut
+                            $user_id = $_SESSION['user']['id'];
+                            $ambil = mysqli_query($db, "SELECT berita.*, user.nama as penulis, user.email, kategori.nama_kategori 
+                                                      FROM berita 
+                                                      JOIN user ON user.id = berita.user_id 
+                                                      JOIN kategori ON kategori.id = berita.kategori_id 
+                                                      WHERE berita.user_id = '$user_id'");
+                        }
+                        
                         $no = 1;
                         while ($data = mysqli_fetch_array($ambil)) {
                         ?>
@@ -43,11 +58,19 @@ switch ($aksi) {
                                 <td><?= $no++ ?></td>
                                 <td><?= $data['judul'] ?></td>
                                 <td><?= $data['nama_kategori'] ?></td>
-                                <td><?= $data['email'] ?></td>
+                                <td><?= $data['penulis'] ?></td>
                                 <td><?= $data['created_at'] ?></td>
                                 <td>
-                                    <a href="index.php?p=berita&aksi=edit&id=<?= $data['id'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
-                                    <a href="proses_berita.php?proses=delete&id=<?= $data['id'] ?>&file=<?= $data['file_upload'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')"> <i class="bi bi-x-circle"></i> Delete</a>
+                                    <?php if($_SESSION['user']['level'] == 'admin' || $_SESSION['user']['id'] == $data['user_id']): ?>
+                                    <a href="index.php?p=berita&aksi=edit&id=<?= $data['id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="proses_berita.php?proses=delete&id=<?= $data['id'] ?>&file=<?= $data['file_upload'] ?>" 
+                                       class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">
+                                        <i class="bi bi-x-circle"></i> Delete
+                                    </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php
@@ -67,6 +90,13 @@ switch ($aksi) {
                     <br>
                     <h2>Tambah Berita</h2>
                     <form action="proses_berita.php?proses=insert" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="user_id" value="<?= $_SESSION['user']['id'] ?>">
+
+                        <div class="mb-3">
+                            <label class="form-label">Penulis</label>
+                            <input type="text" class="form-control" value="<?= $_SESSION['user']['nama'] ?>" disabled>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Judul</label>
                             <input type="text" class="form-control" name="judul">

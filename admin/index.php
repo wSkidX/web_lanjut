@@ -3,8 +3,22 @@ session_start();
 if (!isset($_SESSION['email'])) {
     header('location:../login.php');
 }
-?>
+include 'koneksi.php'; 
+$email = $_SESSION['email'];
 
+
+$query = mysqli_query($db, "SELECT * FROM user WHERE email='$email'");
+$user = mysqli_fetch_assoc($query);
+
+if ($user) {
+    $nama = $user['nama'];
+    $foto = $user['foto'];
+} else {
+    session_destroy();
+    header('location:../login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,81 +33,192 @@ if (!isset($_SESSION['email'])) {
     <link rel="stylesheet" href="AdminLTE-3.2.0/dist/css/adminlte.min.css?v=3.2.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .main-sidebar { background-color: #343a40; }
-        .main-sidebar .brand-link { border-bottom: 1px solid #4b545c; }
-        .main-sidebar .sidebar { padding-top: 0; }
-        .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active { background-color: #007bff; }
-        .content-wrapper { background-color: #f4f6f9; }
-        .main-footer { background-color: #ffffff; border-top: 1px solid #dee2e6; }
+        .main-sidebar {
+            background-color: #141414FF;
+        }
+
+        .main-sidebar .brand-link {
+            border-bottom: 1px solid #4b545c;
+        }
+
+        .main-sidebar .sidebar {
+            padding-top: 0;
+        }
+
+        .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+        .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .content-wrapper {
+            background-color: #f4f6f9;
+        }
+
+        .main-footer {
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .main-header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1030;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            color: #343a40;
+        }
+
+        .navbar-light .navbar-nav .nav-link:hover,
+        .navbar-light .navbar-nav .nav-link:focus {
+            color: #007bff;
+        }
+
+        .user-panel {
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(0,0,0,.1);
+            border-radius: 0.25rem;
+        }
+
+        .user-panel .info {
+            display: inline-block;
+            padding: 5px 5px 5px 10px;
+        }
+
+        .user-panel .info a {
+            color: #c2c7d0;
+        }
+
+        .content-wrapper {
+            margin-top: 57px;
+        }
+
+        .nav-sidebar .nav-link p {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .nav-sidebar .nav-link:hover p {
+            margin-left: 5px;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
+        .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused .brand-text {
+            display: inline;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel .image,
+        .sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused .user-panel .image {
+            display: inline;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .user-panel {
+            padding-left: 10px;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .user-panel .image {
+            margin-left: -5px;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar .nav-link {
+            padding-left: 15px;
+        }
+
+        .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar .nav-link i {
+            margin-right: 0;
+        }
     </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
-        <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="index.php?p=home" class="nav-link">Home</a>
+                    <a href="index.php?p=home" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='home') ? 'active' : '' ?>">Beranda</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="index.php?p=mhs" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='mhs') ? 'active' : '' ?>">Mahasiswa</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="index.php?p=matakuliah" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='matakuliah') ? 'active' : '' ?>">Matakuliah</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="index.php?p=dosen" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='dosen') ? 'active' : '' ?>">Dosen</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="index.php?p=prodi" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='prodi') ? 'active' : '' ?>">Program Studi</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="index.php?p=berita" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='berita') ? 'active' : '' ?>">Berita</a>
                 </li>
             </ul>
 
-            <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown user-menu">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="<?php echo !empty($user['foto']) ? $user['foto'] : 'asset/default-profile.png'; ?>" class="user-image img-circle elevation-2" alt="User Image">
+                        <span class="d-none d-md-inline"><?php echo $user['nama']; ?></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <li class="user-header bg-primary">
+                            <img src="<?php echo !empty($user['foto']) ? $user['foto'] : 'asset/default-profile.png'; ?>" class="img-circle elevation-2" alt="User Image">
+                            <p>
+                                <?php echo $user['nama']; ?>
+                                <small><?php echo $user['email']; ?></small>
+                            </p>
+                        </li>
+                        <li class="user-footer">
+                            <a href="index.php?p=akun" class="btn btn-default btn-flat">Settings</a>
+                            <a href="../logout.php" class="btn btn-default btn-flat float-right">Sign out</a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                         <i class="fas fa-expand-arrows-alt"></i>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../logout.php" role="button" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
-                </li>
             </ul>
         </nav>
-        <!-- /.navbar -->
 
-        <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
             <a href="index.php" class="brand-link">
-                <img src="asset/1595472616513_teknologi-informasi-01-01-300x111.png" alt="TI Logo" class="brand-image img-fluid" style="opacity: .8; max-height: 33px; margin-left: 2px;">
+                <img src="asset/images.png" alt="TI Logo" class="brand-image img-circle elevation-2" style="opacity: .8; max-height: 35px; max-width: 45px; margin-left: auto; object-fit: cover; border-radius: 50%;">
                 <span class="brand-text font-weight-light">TI Admin</span>
             </a>
 
-            <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="asset/images.png" class="img-circle elevation-2" alt="User Image">
+                        <img src="<?php echo !empty($user['foto']) ? $user['foto'] : 'asset/default-profile.png'; ?>" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Admin TI</a>
-                    </div>
-                </div>
-
-                <div class="form-inline">
-                    <div class="input-group" data-widget="sidebar-search">
-                        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-                        <div class="input-group-append">
-                            <button class="btn btn-sidebar">
-                                <i class="fas fa-search fa-fw"></i>
-                            </button>
-                        </div>
+                        <a href="#" class="d-block"><?php echo $user['nama']; ?></a>
                     </div>
                 </div>
 
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="index.php" class="nav-link <?= (!isset($_GET['p']) || $_GET['p']=='home') ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p>
+                                    Beranda
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='mhs') ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-user-graduate"></i>
                                 <p>
                                     Mahasiswa
@@ -103,7 +228,7 @@ if (!isset($_SESSION['email'])) {
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="index.php?p=mhs&aksi=input" class="nav-link">
-                                        <i class="far fa-plus-square nav-icon"></i>
+                                        <i class="far fa-plus-square nav-icon "></i>
                                         <p>Tambah Mahasiswa</p>
                                     </a>
                                 </li>
@@ -116,7 +241,30 @@ if (!isset($_SESSION['email'])) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='matakuliah') ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>
+                                    Mata kuliah
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="index.php?p=matakuliah&aksi=input" class="nav-link">
+                                        <i class="far fa-plus-square nav-icon"></i>
+                                        <p>Tambah Mata kuliah</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="index.php?p=matakuliah" class="nav-link">
+                                        <i class="far fa-list-alt nav-icon"></i>
+                                        <p>Data Matakuliah</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='prodi') ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-graduation-cap"></i>
                                 <p>
                                     Program Studi
@@ -139,7 +287,7 @@ if (!isset($_SESSION['email'])) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='dosen') ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
                                 <p>
                                     Dosen
@@ -162,7 +310,7 @@ if (!isset($_SESSION['email'])) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='kategori') ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-tags"></i>
                                 <p>
                                     Kategori
@@ -185,7 +333,7 @@ if (!isset($_SESSION['email'])) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='berita') ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-newspaper"></i>
                                 <p>
                                     Berita
@@ -207,22 +355,53 @@ if (!isset($_SESSION['email'])) {
                                 </li>
                             </ul>
                         </li>
-                    </ul>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link <?= (isset($_GET['p']) && $_GET['p']=='level') ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-layer-group"></i>
+                                <p>
+                                    Level
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="index.php?p=level&aksi=input" class="nav-link">
+                                        <i class="far fa-plus-square nav-icon"></i>
+                                        <p>Tambah Level</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="index.php?p=level" class="nav-link">
+                                        <i class="far fa-list-alt nav-icon"></i>
+                                        <p>Data Level</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="index.php?p=akun" class="nav-link">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p>Pengaturan Akun</p>
+                            </a>
+                        </li>
                 </nav>
-            </div>
+               
         </aside>
 
         <div class="content-wrapper">
             <?php
-            $page=isset($_GET['p']) ? $_GET['p'] : 'home';
-            if($page=='home') include 'home.php';
-            if($page=='mhs') include 'mahasiswa.php';
-            if($page=='prodi') include 'prodi.php';
-            if($page=='dosen') include 'dosen.php';
-            if($page=='kategori') include 'kategori.php';
-            if($page=='berita') include 'berita.php';
-            if($page=='detail') include 'detail.php';
-        ?>
+            $page = isset($_GET['p']) ? $_GET['p'] : 'home';
+            if ($page == 'home') include 'home.php';
+            if ($page == 'mhs') include 'mahasiswa.php';
+            if ($page == 'prodi') include 'prodi.php';
+            if ($page == 'dosen') include 'dosen.php';
+            if ($page == 'kategori') include 'kategori.php';
+            if ($page == 'berita') include 'berita.php';
+            if ($page == 'detail') include 'detail.php';
+            if ($page == 'akun') include 'akun.php';
+            if ($page == 'matakuliah') include 'matakuliah.php';
+            if ($page == 'level') include 'level.php';
+            ?>
         </div>
 
         <aside class="control-sidebar control-sidebar-dark">
@@ -246,3 +425,4 @@ if (!isset($_SESSION['email'])) {
 </body>
 
 </html>
+
